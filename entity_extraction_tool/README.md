@@ -1,10 +1,12 @@
 # Entity Extraction Tool
 
-Extract country and species names from scientific PDFs downloaded using `pygetpapers`.
+This tool allows you to extract entities like species and countries from PDFs.
 
 ## Installation
 
+To install the tool, clone the repository and install the dependencies:
+
 ```bash
-pip install -r requirements.txt
-python -m spacy download en_core_web_lg
-python -m nltk.downloader punkt
+git clone https://github.com/yourusername/entity_extraction_tool.git
+cd entity_extraction_tool
+pip install -e .

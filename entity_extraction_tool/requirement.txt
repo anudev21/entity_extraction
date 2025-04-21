@@ -1,12 +1,10 @@
 spacy
-scispacy
-en-core-sci-md @ https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_md-0.5.4.tar.gz
-en-core-web-lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.5.0/en_core_web_lg-3.5.0.tar.gz
+requests
 beautifulsoup4
 lxml
 nltk
 tqdm
-pymupdf
-babel
+pyMuPDF
+scispacy
 pandas
-requests
+babel

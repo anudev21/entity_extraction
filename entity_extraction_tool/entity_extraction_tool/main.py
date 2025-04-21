@@ -1,26 +1,31 @@
 import os
 import argparse
-from extractors.country_extractor import extract_countries_from_folder
-from extractors.species_extractor import extract_species_from_folder
+from entity_extraction_tool.extractors.country_extractor import extract_countries_from_pdf
+from entity_extraction_tool.extractors.species_extractor import extract_species_from_pdf
 
 def main():
-    parser = argparse.ArgumentParser(description="Extract species and countries from PDFs in a directory.")
-    parser.add_argument("directory", help="Directory containing PDF files (e.g., disease_india)")
-    parser.add_argument("--entities", choices=["species", "countries", "both"], default="both",
-                        help="Which entities to extract (default: both)")
-
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description="Extract entities (species, countries) from PDFs.")
+    parser.add_argument('directory', type=str, help="Directory containing the PDFs to process")
+    parser.add_argument('--entities', type=str, nargs='+', default=['species', 'country'], help="List of entities to extract (species, country)")
+    
+    # Parse the arguments
     args = parser.parse_args()
-    pdf_folder = args.directory
 
-    if not os.path.isdir(pdf_folder):
-        print(f"Error: Directory '{pdf_folder}' does not exist.")
-        return
+    # Iterate through files in the given directory
+    for filename in os.listdir(args.directory):
+        if filename.endswith(".pdf"):
+            pdf_path = os.path.join(args.directory, filename)
+            print(f"Processing: {pdf_path}")
 
-    if args.entities in ("countries", "both"):
-        extract_countries_from_folder(pdf_folder)
+            # Extract entities based on the user's choice
+            if 'country' in args.entities:
+                print("Extracting countries...")
+                extract_countries_from_pdf(pdf_path)
 
-    if args.entities in ("species", "both"):
-        extract_species_from_folder(pdf_folder)
+            if 'species' in args.entities:
+                print("Extracting species...")
+                extract_species_from_pdf(pdf_path)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
