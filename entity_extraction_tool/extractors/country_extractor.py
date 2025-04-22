@@ -1,21 +1,37 @@
-from entity_extraction_tool.utils.pdf_utils import extract_text_without_references
+import os
 import spacy
 from collections import Counter
 import pandas as pd
+from utils.pdf_utils import extract_text_without_references
 
 # Load spaCy model
 nlp = spacy.load("en_core_web_lg")
 
-def extract_countries_from_pdf(pdf_path):
-    text = extract_text_without_references(pdf_path)
-    doc = nlp(text)
-    
-    countries = [ent.text for ent in doc.ents if ent.label_ == "GPE"]
-    country_counts = Counter(countries)
-    
-    df = pd.DataFrame(country_counts.items(), columns=["Country", "Frequency"])
-    df = df.sort_values(by='Frequency', ascending=False)
-    
-    # Save the result as CSV
-    df.to_csv(f"{pdf_path}_country_frequencies.csv", index=False)
-    print(f"Country frequencies saved to {pdf_path}_country_frequencies.csv")
+def extract_countries_from_pdf(directory):
+    all_country_records = []
+
+    for filename in os.listdir(directory):
+        if filename.endswith(".pdf"):
+            pdf_path = os.path.join(directory, filename)
+            try:
+                text = extract_text_without_references(pdf_path)
+                doc = nlp(text)
+                countries = [ent.text.strip() for ent in doc.ents if ent.label_ == "GPE"]
+                country_counts = Counter(countries)
+
+                for country, freq in country_counts.items():
+                    all_country_records.append({
+                        "filename": filename,
+                        "country": country,
+                        "frequency": freq
+                    })
+
+            except Exception as e:
+                print(f"Error processing {filename}: {e}")
+
+    # Save all to one CSV
+    output_path = os.path.join(directory, "country_entities.csv")
+    df = pd.DataFrame(all_country_records)
+    df = df.sort_values(by=["filename", "frequency"], ascending=[True, False])
+    df.to_csv(output_path, index=False)
+    print(f"Country extraction saved to {output_path}")
