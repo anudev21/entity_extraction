@@ -1,7 +1,7 @@
 import os
 import argparse
 from extractors.country_extractor import extract_countries_from_pdf
-from extractors.country_extractor import extract_species_from_pdf
+from extractors.species_extractor import extract_species_from_pdf
 
 
 def main():
