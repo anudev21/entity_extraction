@@ -10,5 +10,5 @@ pandas
 babel
 spacy
 scispacy
-https://huggingface.co/allenai/scispacy_models/resolve/main/en_core_sci_md-0.5.1.tar.gz
+https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_md-0.5.4.tar.gz
 en_core_web_lg @ https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.0/en_core_web_lg-3.7.0.tar.gz
