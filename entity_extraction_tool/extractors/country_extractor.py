@@ -1,14 +1,17 @@
 import os
 import spacy
-from collections import Counter
 import pandas as pd
+from collections import Counter, defaultdict
 from utils.pdf_utils import extract_text_without_references
+from nltk.tokenize import sent_tokenize
+from babel import Locale
 
-# Load spaCy model
-try:
-    nlp = spacy.load("en_core_web_lg")
-except OSError:
-    print("Model 'en_core_web_lg' not found. Please install it using: pip install en_core_web_lg")
+nlp = spacy.load("en_core_web_lg")
+
+all_countries_list = set(Locale('en').territories.values())
+
+def is_country(text):
+    return text.strip() in all_countries_list
 
 def extract_countries_from_pdf(directory):
     all_country_records = []
@@ -18,11 +21,20 @@ def extract_countries_from_pdf(directory):
             pdf_path = os.path.join(directory, filename)
             try:
                 text = extract_text_without_references(pdf_path)
-                doc = nlp(text)
-                countries = [ent.text.strip() for ent in doc.ents if ent.label_ == "GPE"]
-                country_counts = Counter(countries)
+                if len(text) < 100:
+                    continue
+                sentences = sent_tokenize(text)
+                country_counter = Counter()
 
-                for country, freq in country_counts.items():
+                for sentence in sentences:
+                    doc = nlp(sentence)
+                    for ent in doc.ents:
+                        if ent.label_ == "GPE":
+                            country = ent.text.strip()
+                            if is_country(country):
+                                country_counter[country] += 1
+
+                for country, freq in country_counter.items():
                     all_country_records.append({
                         "filename": filename,
                         "country": country,
@@ -32,12 +44,11 @@ def extract_countries_from_pdf(directory):
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
 
-    # Save all to one CSV
-    output_path = os.path.join(directory, "country_entities.csv")
     if all_country_records:
         df = pd.DataFrame(all_country_records)
         df = df.sort_values(by=["filename", "frequency"], ascending=[True, False])
+        output_path = os.path.join(directory, "country_entities.csv")
         df.to_csv(output_path, index=False)
-        print(f"Country extraction saved to {output_path}")
+        print(f"✅ Country extraction saved to {output_path}")
     else:
-        print("No country entities found. Skipping CSV save.")
+        print("🚫 No country entities found. Skipping CSV save.")
