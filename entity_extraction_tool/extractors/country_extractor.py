@@ -5,7 +5,10 @@ import pandas as pd
 from utils.pdf_utils import extract_text_without_references
 
 # Load spaCy model
-nlp = spacy.load("en_core_web_lg")
+try:
+    nlp = spacy.load("en_core_web_lg")
+except OSError:
+    print("Model 'en_core_web_lg' not found. Please install it using: pip install en_core_web_lg")
 
 def extract_countries_from_pdf(directory):
     all_country_records = []
@@ -31,7 +34,10 @@ def extract_countries_from_pdf(directory):
 
     # Save all to one CSV
     output_path = os.path.join(directory, "country_entities.csv")
-    df = pd.DataFrame(all_country_records)
-    df = df.sort_values(by=["filename", "frequency"], ascending=[True, False])
-    df.to_csv(output_path, index=False)
-    print(f"Country extraction saved to {output_path}")
+    if all_country_records:
+        df = pd.DataFrame(all_country_records)
+        df = df.sort_values(by=["filename", "frequency"], ascending=[True, False])
+        df.to_csv(output_path, index=False)
+        print(f"Country extraction saved to {output_path}")
+    else:
+        print("No country entities found. Skipping CSV save.")

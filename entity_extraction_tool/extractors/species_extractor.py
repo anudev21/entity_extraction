@@ -6,7 +6,10 @@ import pandas as pd
 from utils.pdf_utils import extract_text_without_references
 
 # Load SciSpaCy model for species extraction
-nlp = spacy.load("en_core_sci_md")
+try:
+    nlp = spacy.load("en_core_sci_md")
+except OSError:
+    print("Model 'en_core_sci_md' not found. Please install it using: pip install https://s3.amazonaws.com/allenai-scispacy/models/en_core_sci_md-0.5.1.tar.gz")
 
 # GBIF species validation
 def is_valid_species_gbif(name):
@@ -54,7 +57,10 @@ def extract_species_from_pdf(directory):
 
     # Save all to one CSV
     output_path = os.path.join(directory, "species_entities.csv")
-    df = pd.DataFrame(all_species_records)
-    df = df.sort_values(by=['filename', 'frequency'], ascending=[True, False])
-    df.to_csv(output_path, index=False)
-    print(f"Species extraction saved to {output_path}")
+    if all_species_records:
+        df = pd.DataFrame(all_species_records)
+        df = df.sort_values(by=['filename', 'frequency'], ascending=[True, False])
+        df.to_csv(output_path, index=False)
+        print(f"Species extraction saved to {output_path}")
+    else:
+        print("No species entities found. Skipping CSV save.")
