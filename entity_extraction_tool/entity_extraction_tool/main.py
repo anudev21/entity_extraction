@@ -1,7 +1,8 @@
 import os
 import argparse
-from entity_extraction_tool.extractors.country_extractor import extract_countries_from_pdf
-from entity_extraction_tool.extractors.species_extractor import extract_species_from_pdf
+from extractors.country_extractor import extract_countries_from_pdf
+from extractors.country_extractor import extract_species_from_pdf
+
 
 def main():
     # Set up argument parser
